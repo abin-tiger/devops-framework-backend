@@ -8,6 +8,8 @@ trigger:
   tags:
     include:
     - v*
+
+pr: none
   
 
 variables:
