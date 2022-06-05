@@ -21,6 +21,7 @@ stages:
       vmImage: 'ubuntu-20.04'
 
     steps:
+
     - task: Docker@2
       inputs:
         command: 'build'
@@ -67,7 +68,7 @@ stages:
         vstsFeedPackagePublish: 'devops-framework-backend'
         packagePublishDescription: 'DevOps Framework Backend application'
         versionOption: custom
-        versionPublish: replace($(tag), 'v', '')
+        versionPublish:  ${{ replace(variables['Build.SourceBranch'], 'refs/tags/v', '') }}
 
 
 - stage: Prod
