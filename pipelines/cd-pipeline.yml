@@ -67,7 +67,7 @@ stages:
         vstsFeedPackagePublish: 'devops-framework-backend'
         packagePublishDescription: 'DevOps Framework Backend application'
         versionOption: custom
-        versionPublish: $(tag)
+        versionPublish: replace($(tag), 'v', '')
 
 
 - stage: Prod
