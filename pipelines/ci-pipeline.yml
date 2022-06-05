@@ -1,8 +1,9 @@
 trigger:
-  batch: true
+  batch: false
   branches:
     include:
-    - master
+    - main
+    - release
 
 parameters:
 - name: test
@@ -13,7 +14,7 @@ parameters:
 variables:
   - name: tag
     value: '$(Build.BuildId)'
-  - group: flask-app-common
+  - group: devops-framework-backend-global
 
 stages:
 - stage: 'Build'
@@ -80,9 +81,11 @@ stages:
 
     - publish: $(build.artifactStagingDirectory)
       artifact: drop
-    # Publish a Universal Package
+
     - task: UniversalPackages@0
       displayName: Universal Publish
+      condition: and(succeeded(), $[startsWith(variables['Build.SourceBranch'], 'refs/tags/')])
+
       inputs:
         command: publish
         publishDirectory: '$(Build.ArtifactStagingDirectory)'
@@ -96,14 +99,5 @@ stages:
   jobs:
   - template: templates/deploy-kubernetes.yaml
     parameters:
-      variableGroup: flask-app-dev
+      variableGroup: devops-framework-backend-dev
       environment: dev
-
-- stage: Prod
-  displayName: 'Deploy to the Prod environment'
-  dependsOn: Dev
-  jobs:
-  - template: templates/deploy-kubernetes.yaml
-    parameters:
-      variableGroup: flask-app-prod
-      environment: prod
