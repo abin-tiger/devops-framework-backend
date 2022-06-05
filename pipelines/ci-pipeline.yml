@@ -101,7 +101,7 @@ stages:
   condition: and(
     succeeded(),
     ne(variables['Build.Reason'], 'PullRequest'),
-    ne(variables['Build.SourceBranch'], 'refs/branches/main')
+    eq(variables['Build.SourceBranch'], 'refs/branches/main')
     )
   dependsOn: Build
   jobs:
@@ -115,7 +115,7 @@ stages:
   condition: and(
     succeeded(),
     ne(variables['Build.Reason'], 'PullRequest'),
-    ne(variables['Build.SourceBranch'], 'refs/branches/release')
+    eq(variables['Build.SourceBranch'], 'refs/branches/release')
     )
   dependsOn: Build
   jobs:
