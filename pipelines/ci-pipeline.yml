@@ -97,6 +97,7 @@ stages:
 
 - stage: Dev
   displayName: 'Deploy to the Dev environment'
+  condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
   dependsOn: Build
   jobs:
   - template: templates/deploy-kubernetes.yaml
