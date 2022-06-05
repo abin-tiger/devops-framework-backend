@@ -58,7 +58,7 @@ stages:
     - task: ECRPushImage@1
       name: 'PushToECR'
       inputs:
-        awsCredentials: 'sbd-aws'
+        awsCredentials: $(awsCredentials)
         regionName: 'us-east-1'
         imageSource: 'imagename'
         sourceImageName: $(imageRepository)
