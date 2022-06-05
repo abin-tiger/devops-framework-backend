@@ -26,7 +26,7 @@ jobs:
         - task: KubernetesManifest@0
           inputs:
             action: 'deploy'
-            kubernetesServiceConnection: 'mlops-sandbox-cluster'
+            kubernetesServiceConnection: $(kubernetesServiceConnection)
             namespace: '$(namespace)'
             manifests: '$(Pipeline.Workspace)/drop/k8s/manifests/deployment.yaml'
             containers: '$(ecrImageName)'
