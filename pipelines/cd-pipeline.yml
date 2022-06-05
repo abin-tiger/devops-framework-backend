@@ -1,6 +1,10 @@
 trigger:
   batch: true
 
+  branches:
+    exclude:
+    - 'refs/branches/*'
+
   tags:
     include:
     - v*
