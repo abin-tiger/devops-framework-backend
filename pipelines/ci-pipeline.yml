@@ -96,13 +96,9 @@ stages:
         vstsFeedPackagePublish: 'python-sample-vscode-flask-tutorial'
         packagePublishDescription: 'Python Flask application'
 
-- stage: Sandbox
-  displayName: 'Deploy to the Sandbox environment'
-  condition: and(
-    succeeded(),
-    ne(variables['Build.Reason'], 'PullRequest'),
-    eq(variables['Build.SourceBranch'], 'refs/branches/main')
-    )
+- stage: Dev
+  displayName: 'Deploy to the Dev environment'
+  condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'), eq(variables['Build.SourceBranchName'], 'main'))
   dependsOn: Build
   jobs:
   - template: templates/deploy-kubernetes.yaml
@@ -112,10 +108,7 @@ stages:
 
 - stage: Preprod
   displayName: 'Deploy to the Preprod environment'
-  condition: and(
-    ne(variables['Build.Reason'], 'PullRequest'),
-    eq(variables['Build.SourceBranch'], 'refs/branches/release')
-    )
+  condition: and(ne(variables['Build.Reason'], 'PullRequest'), eq(variables['Build.SourceBranchName'], 'release'))
   dependsOn: Build
   jobs:
   - template: templates/deploy-kubernetes.yaml
