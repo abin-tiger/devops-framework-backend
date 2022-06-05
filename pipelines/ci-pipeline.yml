@@ -113,7 +113,6 @@ stages:
 - stage: Preprod
   displayName: 'Deploy to the Preprod environment'
   condition: and(
-    succeeded(),
     ne(variables['Build.Reason'], 'PullRequest'),
     eq(variables['Build.SourceBranch'], 'refs/branches/release')
     )
