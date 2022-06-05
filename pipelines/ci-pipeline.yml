@@ -84,7 +84,7 @@ stages:
 
     - task: UniversalPackages@0
       displayName: Universal Publish
-      condition: and(succeeded(), $[startsWith(variables['Build.SourceBranch'], 'refs/tags/')])
+      condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
 
       inputs:
         command: publish
