@@ -1,5 +1,5 @@
 trigger:
-  batch: true
+  batch: false
 
   branches:
     exclude:
@@ -8,6 +8,8 @@ trigger:
   tags:
     include:
     - v*
+
+pr: none
   
 
 variables:
