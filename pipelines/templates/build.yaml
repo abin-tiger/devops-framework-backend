@@ -1,3 +1,7 @@
+parameters:
+- name: "test"
+  type: boolean
+
 jobs:
   - job: 'UnitTests'
     condition:  eq('${{ parameters.test }}', 'true')
@@ -67,6 +71,8 @@ jobs:
       inputs:
         command: publish
         publishDirectory: '$(Build.ArtifactStagingDirectory)'
-        vstsFeedPublish: 'learning/python-sample-vscode-flask-tutorial'
-        vstsFeedPackagePublish: 'python-sample-vscode-flask-tutorial'
-        packagePublishDescription: 'Python Flask application'
+        vstsFeedPublish: 'devops-framework/devops-framework-backend'
+        vstsFeedPackagePublish: 'devops-framework-backend'
+        packagePublishDescription: 'DevOps Framework Backend application'
+        versionOption: custom
+        versionPublish:  '$(semanticVersion)'

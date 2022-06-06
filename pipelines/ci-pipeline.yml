@@ -25,6 +25,8 @@ stages:
   displayName: 'Build the web application'
   jobs: 
   - template: templates/build.yaml
+    parameters:
+      test: ${{ parameters.test }}
 
 - stage: Dev
   displayName: 'Deploy to the Dev environment'
