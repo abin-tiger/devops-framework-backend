@@ -1,0 +1,78 @@
+parameters:
+- name: "test"
+  type: boolean
+
+jobs:
+  - job: 'UnitTests'
+    condition:  eq('${{ parameters.test }}', 'true')
+    displayName: "Run unit tests"
+
+    steps:
+    - script: pip install -r requirements.txt
+      displayName: 'Install requirements'
+
+    - script: |
+        pip install pytest pytest-azurepipelines
+        pip install pytest-cov
+        python -m pytest --doctest-modules --junitxml=junit/test-results.xml --cov=hello_app --cov-report=xml
+      displayName: 'pytest'
+
+    - task: PublishTestResults@2
+      condition: succeededOrFailed()
+      inputs:
+        testResultsFiles: '**/test-*.xml'
+        testRunTitle: 'Publish test results for Hello App'
+
+  - job: 'Build'
+    displayName: 'Build job'
+    pool:
+      vmImage: 'ubuntu-20.04'
+
+    steps:
+    - task: Docker@2
+      inputs:
+        command: 'build'
+        Dockerfile: '**/Dockerfile'
+        repository: $(imageRepository)
+        tags: |
+          $(tag)
+    
+    - task: ECRPushImage@1
+      name: 'PushToECR'
+      inputs:
+        awsCredentials: $(awsCredentials)
+        regionName: 'us-east-1'
+        imageSource: 'imagename'
+        sourceImageName: $(imageRepository)
+        sourceImageTag: $(tag)
+        pushTag: $(tag)
+        repositoryName: $(imageRepository)
+        autoCreateRepository: true
+        outputVariable: 'ecrPushOutput'
+        logRequest: true
+        logResponse: true
+
+    - pwsh: |
+        Write-Host "##vso[task.setvariable variable=ecrImage;isOutput=true]$(ecrPushOutput)"
+      name: ECRImageOutputStep
+        
+    - task: CopyFiles@2
+      inputs:
+        sourceFolder: $(Build.SourcesDirectory)/manifests
+        targetFolder: $(Build.ArtifactStagingDirectory)/k8s/manifests
+
+    - publish: $(build.artifactStagingDirectory)
+      artifact: drop
+
+    - task: UniversalPackages@0
+      displayName: Universal Publish
+      condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
+
+      inputs:
+        command: publish
+        publishDirectory: '$(Build.ArtifactStagingDirectory)'
+        vstsFeedPublish: 'devops-framework/devops-framework-backend'
+        vstsFeedPackagePublish: 'devops-framework-backend'
+        packagePublishDescription: 'DevOps Framework Backend application'
+        versionOption: custom
+        versionPublish:  '$(semanticVersion)'
