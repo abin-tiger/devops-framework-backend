@@ -36,7 +36,7 @@ stages:
   - template: templates/deploy-kubernetes-pr.yaml
     parameters:
       environment: pr
-      namespace: $(variables['Build.SourceBranchName'])
+      namespace:  $[ variables['Build.SourceBranchName'] ]
 
 - stage: Dev
   displayName: 'Deploy to the Dev environment'
