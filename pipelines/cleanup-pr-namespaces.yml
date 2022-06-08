@@ -1,0 +1,16 @@
+trigger: none
+
+variables:
+- name: branch
+  value: 'main'
+- name: prNumber
+  value: "0"
+
+steps:
+- task: Kubernetes@1
+  displayName: 'Delete namespace of the pull request'
+  inputs:
+    connectionType: Kubernetes Service Connection
+    kubernetesServiceEndpoint: $(kubernetesServiceConnection)
+    command: delete
+    arguments: ns $(branch)-$(prNumber)
