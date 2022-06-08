@@ -14,6 +14,10 @@ pr:
     include:
     - release
   drafts: false # whether to build draft PRs, defaults to true
+  paths:
+    exclude:
+    - pipelines/*
+    - '*.md'
 
 parameters:
 - name: test
