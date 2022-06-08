@@ -35,6 +35,6 @@ jobs:
           inputs:
             action: 'deploy'
             kubernetesServiceConnection: $(kubernetesServiceConnection)
-            namespace: '${{parameters.namespace}}'
+            namespace: $[replace(parameters.namespace, '/', '-')]
             manifests: '$(Pipeline.Workspace)/drop/k8s/manifests/deployment.yaml'
             containers: '$(ecrImageName)'
