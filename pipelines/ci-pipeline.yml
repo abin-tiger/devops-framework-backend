@@ -8,6 +8,7 @@ trigger:
     exclude:
     - pipelines/*
     - '*.md'
+    - .github/workflows
 pr:
   autoCancel: true # indicates whether additional pushes to a PR should cancel in-progress runs for the same PR. Defaults to true
   branches:
@@ -18,6 +19,7 @@ pr:
     exclude:
     - pipelines/*
     - '*.md'
+    - .github/workflows
 
 parameters:
 - name: test
