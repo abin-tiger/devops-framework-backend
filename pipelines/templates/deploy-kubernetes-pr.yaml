@@ -22,6 +22,24 @@ jobs:
           inputs:
             script: echo "Deploying image $(ecrImageName)"
 
+        - task: Kubernetes@1
+          displayName: kubectl prepare namespace yaml
+          inputs:
+            connectionType: Kubernetes Service Connection
+            kubernetesServiceEndpoint: $(kubernetesServiceConnection)
+            command: create
+            arguments: -n $(namespace) --dry-run=client -o yaml > ns.yaml
+            useConfigurationFile: false
+
+        - task: Kubernetes@1
+          displayName: kubectl create namespace
+          inputs:
+            connectionType: Kubernetes Service Connection
+            kubernetesServiceEndpoint: $(kubernetesServiceConnection)
+            command: apply
+            useConfigurationFile: true
+            configuration: ns.yaml
+
         - task: KubernetesManifest@0
           inputs:
             action: 'deploy'
