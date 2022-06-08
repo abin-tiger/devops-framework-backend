@@ -22,14 +22,13 @@ jobs:
           inputs:
             script: echo "Deploying image $(ecrImageName)"
 
-        - task: Kubernetes@1
-          displayName: kubectl prepare namespace yaml
+        - task: AzureCLI@2
           inputs:
-            connectionType: Kubernetes Service Connection
-            kubernetesServiceEndpoint: $(kubernetesServiceConnection)
-            command: create
-            arguments: -n $(namespace) --dry-run=client -o yaml > ns.yaml
-            useConfigurationFile: false
+            scriptType: 'bash'
+            scriptLocation: 'inlineScript'
+            inlineScript: |
+              kubectl create ns $(namespace) --dry-run=client -o yaml > ns.yaml
+          displayName: kubectl prepare namespace yaml
 
         - task: Kubernetes@1
           displayName: kubectl create namespace
