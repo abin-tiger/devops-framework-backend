@@ -1,0 +1,17 @@
+name: Cleanup PR resources on K8s
+
+# only trigger on pull request closed events
+on:
+  pull_request:
+    types: [ closed ]
+
+jobs:
+  trigger_azure_pipeline:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: Azure/pipelines@v1
+      with:
+        azure-devops-project-url: 'https://dev.azure.com/abin-tiger/devops-framework'
+        azure-pipeline-name: 'cleanup-pr-namespaces'
+        azure-devops-token: '${{ secrets.AZURE_DEVOPS_TOKEN }}'
+        azure-pipeline-variables:  '{"branch": "${{ github.event.pull_request.head.ref }}", "prNumber": "${{ github.event.pull_request.number }}"}'
