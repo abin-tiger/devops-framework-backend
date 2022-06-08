@@ -48,7 +48,7 @@ stages:
   - template: templates/deploy-kubernetes-pr.yaml
     parameters:
       environment: pr
-      namespace: '$(System.PullRequest.SourceBranch)-$(System.PullRequest.PullRequestNumber)'
+      namespace: ${{ replace('$(System.PullRequest.SourceBranch)-$(System.PullRequest.PullRequestNumber)', '/', '-') }}
 
 - stage: Dev
   displayName: 'Deploy to the Dev environment'
