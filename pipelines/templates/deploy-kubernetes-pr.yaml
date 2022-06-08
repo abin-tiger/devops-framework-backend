@@ -10,7 +10,7 @@ jobs:
   - name: ecrImageName
     value: "$[stageDependencies.Build.Build.outputs['ECRImageOutputStep.ecrImage']]"
   - name: k8sNamespace
-    value: $[replace(parameters.namespace, '/', '-')]
+    value: $${ replace(parameters.namespace, '/', '-') }}
   pool:
     vmImage: 'ubuntu-20.04'
   environment: ${{parameters.environment}}
