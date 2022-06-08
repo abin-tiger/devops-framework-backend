@@ -9,7 +9,7 @@ jobs:
   variables:
   - name: ecrImageName
     value: "$[stageDependencies.Build.Build.outputs['ECRImageOutputStep.ecrImage']]"
-  - name: namespace
+  - name: k8sNamespace
     value: $[replace(parameters.namespace, '/', '-')]
   pool:
     vmImage: 'ubuntu-20.04'
@@ -31,12 +31,12 @@ jobs:
             kubernetesServiceEndpoint: $(kubernetesServiceConnection)
             command: apply
             useConfigurationFile: true
-            inline: '{ "kind": "Namespace", "apiVersion": "v1", "metadata": { "name": "$(namespace)" }}'
+            inline: '{ "kind": "Namespace", "apiVersion": "v1", "metadata": { "name": "$(k8sNamespace)" }}'
 
         - task: KubernetesManifest@0
           inputs:
             action: 'deploy'
             kubernetesServiceConnection: $(kubernetesServiceConnection)
-            namespace: $(namespace)
+            namespace: $(k8sNamespace)
             manifests: '$(Pipeline.Workspace)/drop/k8s/manifests/deployment.yaml'
             containers: '$(ecrImageName)'
