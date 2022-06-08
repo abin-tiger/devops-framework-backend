@@ -1,10 +1,7 @@
 trigger: none
 
 variables:
-- name: branch
-  value: 'main'
-- name: prNumber
-  value: "0"
+- group: devops-framework-backend-global
 
 steps:
 - task: Kubernetes@1
@@ -13,4 +10,4 @@ steps:
     connectionType: Kubernetes Service Connection
     kubernetesServiceEndpoint: $(kubernetesServiceConnection)
     command: delete
-    arguments: ns $(branch)-$(prNumber)
+    arguments: 'ns $(branch)-$(prNumber)'
