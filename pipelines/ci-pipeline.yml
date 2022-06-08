@@ -28,6 +28,16 @@ stages:
     parameters:
       test: ${{ parameters.test }}
 
+- stage: PR
+  displayName: 'Deploy to the temporary PR environment'
+  condition: and(succeeded(), eq(variables['Build.Reason'], 'PullRequest'))
+  dependsOn: Build
+  jobs:
+  - template: templates/deploy-kubernetes-pr.yaml
+    parameters:
+      environment: pr
+      namespace: variables['Build.SourceBranchName']
+
 - stage: Dev
   displayName: 'Deploy to the Dev environment'
   condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'), eq(variables['Build.SourceBranchName'], 'main'))
