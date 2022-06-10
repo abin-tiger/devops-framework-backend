@@ -3,15 +3,17 @@ pr: none
 
 variables:
 - group: devops-framework-backend-global
-- name: namespace
-  value: $[ replace(variables['branch'], '/', '-') ]-$(prNumber)
 
-steps:
-- checkout: none
-- task: Kubernetes@1
-  displayName: 'Delete namespace of the pull request'
-  inputs:
-    connectionType: Kubernetes Service Connection
-    kubernetesServiceEndpoint: $(kubernetesServiceConnection)
-    command: delete
-    arguments: ns $(branch)-$(prNumber)
+jobs:
+  - job: CleanupNamespaces
+    variables:
+      namespace: $[format('{0}-{1}', replace(variables['branch'], '/', '-'), variables['prNumber'])]
+    steps:
+    - checkout: none
+    - task: Kubernetes@1
+      displayName: 'Delete namespace of the pull request'
+      inputs:
+        connectionType: Kubernetes Service Connection
+        kubernetesServiceEndpoint: $(kubernetesServiceConnection)
+        command: delete
+        arguments: ns $(namespace)
