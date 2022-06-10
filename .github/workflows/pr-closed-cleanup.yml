@@ -9,7 +9,7 @@ jobs:
   trigger_azure_pipeline:
     runs-on: ubuntu-latest
     steps:
-    - uses: Azure/pipelines@v1
+    - uses: Azure/pipelines@v1.2
       with:
         azure-devops-project-url: 'https://dev.azure.com/abin-tiger/devops-framework'
         azure-pipeline-name: 'cleanup-pr-namespaces'
