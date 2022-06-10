@@ -5,6 +5,7 @@ variables:
 - group: devops-framework-backend-global
 
 steps:
+- checkout: none
 - task: Kubernetes@1
   displayName: 'Delete namespace of the pull request'
   inputs:
