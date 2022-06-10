@@ -37,17 +37,17 @@ variables:
     value: 'System.PullRequest.PullRequestNumber'
 
 stages:
-- stage: 'Build'
-  displayName: 'Build the web application'
-  jobs: 
-  - template: templates/build.yaml
-    parameters:
-      test: ${{ parameters.test }}
+# - stage: 'Build'
+#   displayName: 'Build the web application'
+#   jobs: 
+#   - template: templates/build.yaml
+#     parameters:
+#       test: ${{ parameters.test }}
 
 - ${{ if eq(variables['Build.Reason'], 'PullRequest') }}:
   - stage: DeployPR
     displayName: 'Deploy to the temporary PR environment'
-    dependsOn: Build
+    # dependsOn: Build
     jobs:
     - template: templates/deploy-kubernetes-pr.yaml
       parameters:
