@@ -44,32 +44,32 @@ stages:
     parameters:
       test: ${{ parameters.test }}
 
-- stage: DeployPR
-  displayName: 'Deploy to the temporary PR environment'
-  condition: and(succeeded(), eq(variables['Build.Reason'], 'PullRequest'))
-  dependsOn: Build
-  jobs:
-  - template: templates/deploy-kubernetes-pr.yaml
-    parameters:
-      environment: pr
-      namespace: ${{ format('{0}-{1}', replace(variables['prSourceBranch'], '/', '-'), variables['prNumber']) }}
+- ${{ if eq(variables['Build.Reason'], 'PullRequest') }}:
+  - stage: DeployPR
+    displayName: 'Deploy to the temporary PR environment'
+    dependsOn: Build
+    jobs:
+    - template: templates/deploy-kubernetes-pr.yaml
+      parameters:
+        environment: pr
+        namespace: $[format('{0}-{1}', replace(variables['prSourceBranch'], '/', '-'), variables['prNumber'])]
 
-- stage: DeployDev
-  displayName: 'Deploy to the Dev environment'
-  condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'), eq(variables['Build.SourceBranchName'], 'main'))
-  dependsOn: Build
-  jobs:
-  - template: templates/deploy-kubernetes.yaml
-    parameters:
-      variableGroup: devops-framework-backend-dev
-      environment: dev
+- ${{ if and(ne(variables['Build.Reason'], 'PullRequest'), eq(variables['Build.SourceBranchName'], 'main')) }}:
+  - stage: DeployDev
+    displayName: 'Deploy to the Dev environment'
+    dependsOn: Build
+    jobs:
+    - template: templates/deploy-kubernetes.yaml
+      parameters:
+        variableGroup: devops-framework-backend-dev
+        environment: dev
 
-- stage: DeployPreprod
-  displayName: 'Deploy to the Preprod environment'
-  condition: and(ne(variables['Build.Reason'], 'PullRequest'), eq(variables['Build.SourceBranchName'], 'release'))
-  dependsOn: Build
-  jobs:
-  - template: templates/deploy-kubernetes.yaml
-    parameters:
-      variableGroup: devops-framework-backend-preprod
-      environment: preprod
+- ${{ if and(ne(variables['Build.Reason'], 'PullRequest'), eq(variables['Build.SourceBranchName'], 'release')) }}:
+  - stage: DeployPreprod
+    displayName: 'Deploy to the Preprod environment'
+    dependsOn: Build
+    jobs:
+    - template: templates/deploy-kubernetes.yaml
+      parameters:
+        variableGroup: devops-framework-backend-preprod
+        environment: preprod
