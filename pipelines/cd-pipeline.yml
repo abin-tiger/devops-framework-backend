@@ -29,6 +29,10 @@ stages:
 
 - stage: Prod
   displayName: 'Deploy to the Prod environment'
+  variables:
+  - group: devops-framework-backend-prod
+  - name: ecrImageName
+    value: "$[stageDependencies.Build.Build.outputs['ECRImageOutputStep.ecrImage']]"
   condition: and(
     succeeded(),
     ne(variables['Build.Reason'], 'PullRequest'),
@@ -38,5 +42,4 @@ stages:
   jobs:
   - template: templates/deploy-kubernetes.yaml
     parameters:
-      variableGroup: devops-framework-backend-prod
       environment: prod
