@@ -4,6 +4,8 @@ name: Cleanup PR resources on K8s
 on:
   pull_request:
     types: [ closed ]
+    branches:    
+      - 'feature/**'
 
 jobs:
   trigger_azure_pipeline:
