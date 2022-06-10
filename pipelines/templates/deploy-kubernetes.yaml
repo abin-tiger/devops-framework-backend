@@ -37,3 +37,11 @@ jobs:
             namespace: '$(namespace)'
             manifests: '$(Pipeline.Workspace)/drop/k8s/manifests/deployment.yaml'
             containers: '$(ecrImageName)'
+
+        - task: GitHubComment@0
+          displayName: "Add comment to PR with namespace"
+          condition: and(succeeded(), eq(parameters.environment, 'pr'))
+          inputs:
+            gitHubConnection: $(githubServiceConnection)
+            repositoryName: '$(Build.Repository.Name)'
+            comment: 'Deploy app to namespace $(namespace)'
