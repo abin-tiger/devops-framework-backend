@@ -22,7 +22,7 @@ jobs:
 
         - task: Kubernetes@1
           displayName: 'Create a new namespace for the pull request'
-          condition: and(succeeded(), eq(parameters.environment, 'pr'))
+          condition: and(succeeded(), eq('${{parameters.environment}}', 'pr'))
           inputs:
             connectionType: Kubernetes Service Connection
             kubernetesServiceEndpoint: $(kubernetesServiceConnection)
@@ -40,7 +40,7 @@ jobs:
 
         - task: GitHubComment@0
           displayName: "Add comment to PR with namespace"
-          condition: and(succeeded(), eq(parameters.environment, 'pr'))
+          condition: and(succeeded(), eq('${{parameters.environment}}', 'pr'))
           inputs:
             gitHubConnection: $(githubServiceConnection)
             repositoryName: '$(Build.Repository.Name)'
