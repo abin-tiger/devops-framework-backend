@@ -12,4 +12,4 @@ steps:
     connectionType: Kubernetes Service Connection
     kubernetesServiceEndpoint: $(kubernetesServiceConnection)
     command: delete
-    arguments: 'ns $(branch)-$(prNumber)'
+    arguments: ns $(branch)-$(prNumber)
