@@ -49,7 +49,7 @@ stages:
         value: $[format('{0}-{1}', replace(variables['System.PullRequest.SourceBranch'], '/', '-'), variables['System.PullRequest.PullRequestNumber'])]
 
     jobs:
-    - template: templates/deploy-kubernetes-pr.yaml
+    - template: templates/deploy-kubernetes.yaml
       parameters:
         environment: pr
 
