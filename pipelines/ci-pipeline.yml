@@ -31,6 +31,10 @@ variables:
   - name: tag
     value: '$(Build.BuildId)'
   - group: devops-framework-backend-global
+  - name: prSourceBranch
+    value: System.PullRequest.SourceBranch
+  - name: prNumber
+    value: System.PullRequest.PullRequestNumber
 
 stages:
 - stage: 'Build'
@@ -40,7 +44,7 @@ stages:
     parameters:
       test: ${{ parameters.test }}
 
-- stage: PR
+- stage: DeployPR
   displayName: 'Deploy to the temporary PR environment'
   condition: and(succeeded(), eq(variables['Build.Reason'], 'PullRequest'))
   dependsOn: Build
@@ -48,9 +52,9 @@ stages:
   - template: templates/deploy-kubernetes-pr.yaml
     parameters:
       environment: pr
-      namespace: $[format('{0}-{1}', replace(variables['System.PullRequest.SourceBranch'], '/', '-'), variables['System.PullRequest.PullRequestNumber'])]
+      namespace: $[format('{0}-{1}', replace(variables['prSourceBranch'], '/', '-'), variables['prNumber'])]
 
-- stage: Dev
+- stage: DeployDev
   displayName: 'Deploy to the Dev environment'
   condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'), eq(variables['Build.SourceBranchName'], 'main'))
   dependsOn: Build
@@ -60,7 +64,7 @@ stages:
       variableGroup: devops-framework-backend-dev
       environment: dev
 
-- stage: Preprod
+- stage: DeployPreprod
   displayName: 'Deploy to the Preprod environment'
   condition: and(ne(variables['Build.Reason'], 'PullRequest'), eq(variables['Build.SourceBranchName'], 'release'))
   dependsOn: Build
