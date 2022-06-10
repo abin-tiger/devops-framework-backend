@@ -14,6 +14,7 @@ pr:
   branches:
     include:
     - main
+    - release
   drafts: false # whether to build draft PRs, defaults to true
   paths:
     exclude:
@@ -40,7 +41,7 @@ stages:
     parameters:
       test: ${{ parameters.test }}
 
-- ${{ if eq(variables['Build.Reason'], 'PullRequest') }}:
+- ${{ if and(eq(variables['System.PullRequest.TargetBranch'], 'main'), eq(variables['Build.Reason'], 'PullRequest')) }}:
   - stage: DeployPR
     displayName: 'Deploy to the temporary PR environment'
     dependsOn: Build
