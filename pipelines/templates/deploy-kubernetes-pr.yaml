@@ -1,14 +1,19 @@
 parameters:
 - name: "environment"
   type: string
-- name: 'namespace'    
+- name: 'prSourceBranch'    
   type: string
+- name: 'prNumber'    
+  type: string
+
 
 jobs:
 - deployment: Deploy
   variables:
   - name: ecrImageName
     value: "$[stageDependencies.Build.Build.outputs['ECRImageOutputStep.ecrImage']]"
+  - name: namespace
+    value: $[format('{0}-{1}', replace('${{parameters.prSourceBranch}}', '/', '-'), '${{parameters.prNumber}}')]
   pool:
     vmImage: 'ubuntu-20.04'
   environment: ${{parameters.environment}}
@@ -16,11 +21,11 @@ jobs:
     runOnce:
       deploy:
         steps:
-        - download: current
-          artifact: 'drop'
-        - task: CmdLine@2
-          inputs:
-            script: echo "Deploying image $(ecrImageName)"
+        # - download: current
+        #   artifact: 'drop'
+        # - task: CmdLine@2
+        #   inputs:
+        #     script: echo "Deploying image $(ecrImageName)"
 
         - task: Kubernetes@1
           displayName: 'Create a new namespace for the pull request'
@@ -29,12 +34,12 @@ jobs:
             kubernetesServiceEndpoint: $(kubernetesServiceConnection)
             command: apply
             useConfigurationFile: true
-            inline: '{ "kind": "Namespace", "apiVersion": "v1", "metadata": { "name": "${{parameters.namespace}}" }}'
+            inline: '{ "kind": "Namespace", "apiVersion": "v1", "metadata": { "name": "$(namespace)" }}'
 
         - task: KubernetesManifest@0
           inputs:
             action: 'deploy'
             kubernetesServiceConnection: $(kubernetesServiceConnection)
-            namespace: ${{parameters.namespace}}
+            namespace: $(namespace)
             manifests: '$(Pipeline.Workspace)/drop/k8s/manifests/deployment.yaml'
             containers: '$(ecrImageName)'

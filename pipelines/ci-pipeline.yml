@@ -31,10 +31,6 @@ variables:
   - name: tag
     value: '$(Build.BuildId)'
   - group: devops-framework-backend-global
-  - name: prSourceBranch
-    value: 'System.PullRequest.SourceBranch'
-  - name: prNumber
-    value: 'System.PullRequest.PullRequestNumber'
 
 stages:
 # - stage: 'Build'
@@ -52,7 +48,8 @@ stages:
     - template: templates/deploy-kubernetes-pr.yaml
       parameters:
         environment: pr
-        namespace: ${{ format('{0}-{1}', replace(variables['prSourceBranch'], '/', '-'), variables['prNumber']) }}
+        prSourceBranch: $(System.PullRequest.SourceBranch)
+        prNumber: $(System.PullRequest.PullRequestNumber)
 
 - ${{ if and(ne(variables['Build.Reason'], 'PullRequest'), eq(variables['Build.SourceBranchName'], 'main')) }}:
   - stage: DeployDev
