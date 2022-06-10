@@ -35,7 +35,6 @@ stages:
     value: "$[stageDependencies.Build.Build.outputs['ECRImageOutputStep.ecrImage']]"
   condition: and(
     succeeded(),
-    ne(variables['Build.Reason'], 'PullRequest'),
     startsWith(variables['Build.SourceBranch'], 'refs/tags/')
     )
   dependsOn: Build
