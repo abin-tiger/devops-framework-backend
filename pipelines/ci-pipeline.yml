@@ -45,9 +45,10 @@ stages:
     displayName: 'Deploy to the temporary PR environment'
     dependsOn: Build
     variables:
-      - name: namespace
-        value: $[format('{0}-{1}', replace(variables['System.PullRequest.SourceBranch'], '/', '-'), variables['System.PullRequest.PullRequestNumber'])]
-
+    - name: namespace
+      value: $[format('{0}-{1}', replace(variables['System.PullRequest.SourceBranch'], '/', '-'), variables['System.PullRequest.PullRequestNumber'])]
+    - name: ecrImageName
+      value: "$[stageDependencies.Build.Build.outputs['ECRImageOutputStep.ecrImage']]"
     jobs:
     - template: templates/deploy-kubernetes.yaml
       parameters:
@@ -59,6 +60,8 @@ stages:
     dependsOn: Build
     variables:
     - group: devops-framework-backend-dev
+    - name: ecrImageName
+      value: "$[stageDependencies.Build.Build.outputs['ECRImageOutputStep.ecrImage']]"
     jobs:
     - template: templates/deploy-kubernetes.yaml
       parameters:
@@ -70,6 +73,8 @@ stages:
     dependsOn: Build
     variables:
     - group: devops-framework-backend-preprod
+    - name: ecrImageName
+      value: "$[stageDependencies.Build.Build.outputs['ECRImageOutputStep.ecrImage']]"
     jobs:
     - template: templates/deploy-kubernetes.yaml
       parameters:
