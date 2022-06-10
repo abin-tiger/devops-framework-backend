@@ -20,15 +20,15 @@ jobs:
           inputs:
             script: echo "Deploying image $(ecrImageName)"
 
-        - ${{ if eq(parameters.environment, 'pr') }}:
-          - task: Kubernetes@1
-            displayName: 'Create a new namespace for the pull request'
-            inputs:
-              connectionType: Kubernetes Service Connection
-              kubernetesServiceEndpoint: $(kubernetesServiceConnection)
-              command: apply
-              useConfigurationFile: true
-              inline: '{ "kind": "Namespace", "apiVersion": "v1", "metadata": { "name": "$(namespace)" }}'
+        - task: Kubernetes@1
+          displayName: 'Create a new namespace for the pull request'
+          condition: and(succeeded(), eq(parameters.environment, 'pr'))
+          inputs:
+            connectionType: Kubernetes Service Connection
+            kubernetesServiceEndpoint: $(kubernetesServiceConnection)
+            command: apply
+            useConfigurationFile: true
+            inline: '{ "kind": "Namespace", "apiVersion": "v1", "metadata": { "name": "$(namespace)" }}'
 
         - task: KubernetesManifest@0
           inputs:
