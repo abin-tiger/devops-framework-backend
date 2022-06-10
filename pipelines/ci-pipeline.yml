@@ -52,7 +52,7 @@ stages:
   - template: templates/deploy-kubernetes-pr.yaml
     parameters:
       environment: pr
-      namespace: $[format('{0}-{1}', replace(variables['prSourceBranch'], '/', '-'), variables['prNumber'])]
+      namespace: ${{ format('{0}-{1}', replace(variables['prSourceBranch'], '/', '-'), variables['prNumber']) }}
 
 - stage: DeployDev
   displayName: 'Deploy to the Dev environment'
