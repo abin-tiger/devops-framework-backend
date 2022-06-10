@@ -40,32 +40,42 @@ stages:
     parameters:
       test: ${{ parameters.test }}
 
-- stage: PR
-  displayName: 'Deploy to the temporary PR environment'
-  condition: and(succeeded(), eq(variables['Build.Reason'], 'PullRequest'))
-  dependsOn: Build
-  jobs:
-  - template: templates/deploy-kubernetes-pr.yaml
-    parameters:
-      environment: pr
-      namespace: '$(System.PullRequest.SourceBranch)-$(System.PullRequest.PullRequestNumber)'
+- ${{ if eq(variables['Build.Reason'], 'PullRequest') }}:
+  - stage: DeployPR
+    displayName: 'Deploy to the temporary PR environment'
+    dependsOn: Build
+    variables:
+    - name: namespace
+      value: $[format('{0}-{1}', replace(variables['System.PullRequest.SourceBranch'], '/', '-'), variables['System.PullRequest.PullRequestNumber'])]
+    - name: ecrImageName
+      value: "$[stageDependencies.Build.Build.outputs['ECRImageOutputStep.ecrImage']]"
+    jobs:
+    - template: templates/deploy-kubernetes.yaml
+      parameters:
+        environment: pr
 
-- stage: Dev
-  displayName: 'Deploy to the Dev environment'
-  condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'), eq(variables['Build.SourceBranchName'], 'main'))
-  dependsOn: Build
-  jobs:
-  - template: templates/deploy-kubernetes.yaml
-    parameters:
-      variableGroup: devops-framework-backend-dev
-      environment: dev
+- ${{ if and(ne(variables['Build.Reason'], 'PullRequest'), eq(variables['Build.SourceBranchName'], 'main')) }}:
+  - stage: DeployDev
+    displayName: 'Deploy to the Dev environment'
+    dependsOn: Build
+    variables:
+    - group: devops-framework-backend-dev
+    - name: ecrImageName
+      value: "$[stageDependencies.Build.Build.outputs['ECRImageOutputStep.ecrImage']]"
+    jobs:
+    - template: templates/deploy-kubernetes.yaml
+      parameters:
+        environment: dev
 
-- stage: Preprod
-  displayName: 'Deploy to the Preprod environment'
-  condition: and(ne(variables['Build.Reason'], 'PullRequest'), eq(variables['Build.SourceBranchName'], 'release'))
-  dependsOn: Build
-  jobs:
-  - template: templates/deploy-kubernetes.yaml
-    parameters:
-      variableGroup: devops-framework-backend-preprod
-      environment: preprod
+- ${{ if and(ne(variables['Build.Reason'], 'PullRequest'), eq(variables['Build.SourceBranchName'], 'release')) }}:
+  - stage: DeployPreprod
+    displayName: 'Deploy to the Preprod environment'
+    dependsOn: Build
+    variables:
+    - group: devops-framework-backend-preprod
+    - name: ecrImageName
+      value: "$[stageDependencies.Build.Build.outputs['ECRImageOutputStep.ecrImage']]"
+    jobs:
+    - template: templates/deploy-kubernetes.yaml
+      parameters:
+        environment: preprod
