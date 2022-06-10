@@ -33,40 +33,44 @@ variables:
   - group: devops-framework-backend-global
 
 stages:
-# - stage: 'Build'
-#   displayName: 'Build the web application'
-#   jobs: 
-#   - template: templates/build.yaml
-#     parameters:
-#       test: ${{ parameters.test }}
+- stage: 'Build'
+  displayName: 'Build the web application'
+  jobs: 
+  - template: templates/build.yaml
+    parameters:
+      test: ${{ parameters.test }}
 
 - ${{ if eq(variables['Build.Reason'], 'PullRequest') }}:
   - stage: DeployPR
     displayName: 'Deploy to the temporary PR environment'
-    # dependsOn: Build
+    dependsOn: Build
+    variables:
+      - name: namespace
+        value: $[format('{0}-{1}', replace(variables['System.PullRequest.SourceBranch'], '/', '-'), variables['System.PullRequest.PullRequestNumber'])]
+
     jobs:
     - template: templates/deploy-kubernetes-pr.yaml
       parameters:
         environment: pr
-        prSourceBranch: $(System.PullRequest.SourceBranch)
-        prNumber: $(System.PullRequest.PullRequestNumber)
 
 - ${{ if and(ne(variables['Build.Reason'], 'PullRequest'), eq(variables['Build.SourceBranchName'], 'main')) }}:
   - stage: DeployDev
     displayName: 'Deploy to the Dev environment'
     dependsOn: Build
+    variables:
+    - group: devops-framework-backend-dev
     jobs:
     - template: templates/deploy-kubernetes.yaml
       parameters:
-        variableGroup: devops-framework-backend-dev
         environment: dev
 
 - ${{ if and(ne(variables['Build.Reason'], 'PullRequest'), eq(variables['Build.SourceBranchName'], 'release')) }}:
   - stage: DeployPreprod
     displayName: 'Deploy to the Preprod environment'
     dependsOn: Build
+    variables:
+    - group: devops-framework-backend-preprod
     jobs:
     - template: templates/deploy-kubernetes.yaml
       parameters:
-        variableGroup: devops-framework-backend-preprod
         environment: preprod

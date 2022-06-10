@@ -1,19 +1,12 @@
 parameters:
 - name: "environment"
   type: string
-- name: 'prSourceBranch'    
-  type: string
-- name: 'prNumber'    
-  type: string
-
 
 jobs:
 - deployment: Deploy
   variables:
   - name: ecrImageName
     value: "$[stageDependencies.Build.Build.outputs['ECRImageOutputStep.ecrImage']]"
-  - name: namespace
-    value: $[format('{0}-{1}', replace('${{parameters.prSourceBranch}}', '/', '-'), '${{parameters.prNumber}}')]
   pool:
     vmImage: 'ubuntu-20.04'
   environment: ${{parameters.environment}}
@@ -21,11 +14,11 @@ jobs:
     runOnce:
       deploy:
         steps:
-        # - download: current
-        #   artifact: 'drop'
-        # - task: CmdLine@2
-        #   inputs:
-        #     script: echo "Deploying image $(ecrImageName)"
+        - download: current
+          artifact: 'drop'
+        - task: CmdLine@2
+          inputs:
+            script: echo "Deploying image $(ecrImageName)"
 
         - task: Kubernetes@1
           displayName: 'Create a new namespace for the pull request'
